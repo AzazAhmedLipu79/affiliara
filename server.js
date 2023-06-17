@@ -1,9 +1,9 @@
 const express = require("express");
-const fs = require("fs");
+require("./db");
+const UserModel = require("./Model/user");
 const port = 3721;
 const cors = require("cors");
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 app.use("/user", express.static("user.txt"));
@@ -18,61 +18,43 @@ app.get("/newsletter", (req, res) => {
   res.send({ users: "All users" });
 });
 
-app.post("/newsletter", (req, res) => {
-  if (!req.body.email || !req.body.name) {
-    return res.status(400).send({ message: "no data given" });
-  }
-
-  console.log(req.body);
-  const data = `${req.body.name}, ${req.body.email}\n`;
-  const dataJsonFormat = {
-    name: req.body.name,
-    email: req.body.email,
-  };
-  const dataJson = JSON.stringify(dataJsonFormat);
-
-  const onlyEmailData = `${req.body.email},`;
+app.post("/newsletter", async (req, res) => {
+  let body = req.body;
   try {
-    fs.appendFileSync("user.txt", data, "utf-8");
-  } catch (error) {
-    res.send("File Doesn't Exist");
-  }
+    if (body != undefined) {
+      const { name, email } = body;
 
-  try {
-    fs.appendFileSync("user.json", dataJson, "utf-8");
+      let data = {
+        name,
+        email,
+      };
+      let User = new UserModel(data);
+      let CreateUser = await User.save();
+      //   sendPushToAllSubscribedUsers();
+      res.status(201).send({ status: "SUCCESS", data: CreateUser });
+    } else {
+      res.status(404).send({ status: "BODY_DATA_NOT_FOUND" });
+    }
   } catch (error) {
-    res.send("File Doesn't Exist");
+    console.log(error);
+    res.status(400).send({ status: "FAILED", message: "Something went wrong" });
   }
-  try {
-    fs.appendFileSync("email.txt", onlyEmailData, "utf-8");
-  } catch (error) {
-    res.send("File Doesn't Exist");
-  }
-
-  res.send({ success: true, name: req.body.name, email: req.body.email });
 });
 
-app.get("/cleardata", (req, res) => {
+app.get("/alluser", async (req, res) => {
   try {
-    fs.writeFileSync("user.txt", "", "utf-8");
+    let query = req.query;
+    let results = [];
+    if (query.id != undefined) {
+      results = await UserModel.findOne({ _id: query.id }).sort({});
+    } else {
+      results = await UserModel.find().sort({});
+    }
+    res.send(results);
   } catch (error) {
-    res.send("File Doesn't Exist");
+    res.status(400).send(error);
   }
-
-  try {
-    fs.writeFileSync("user.json", "", "utf-8");
-  } catch (error) {
-    res.send("File Doesn't Exist");
-  }
-  try {
-    fs.writeFileSync("email.txt", "", "utf-8");
-  } catch (error) {
-    res.send("File Doesn't Exist");
-  }
-
-  res.send({ message: "Successfully Data Cleared" });
 });
-
 app.listen(port, () => {
   console.log("Server is Running at ", port);
 });

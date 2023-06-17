@@ -1,0 +1,27 @@
+{
+  "name": "affiliara_express",
+  "version": "0.0.1",
+  "description": "This is the backend of Affiliara",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AzazAhmedLipu79/Affiliara.git"
+  },
+  "author": "AzazAhmedLipu79",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AzazAhmedLipu79/Affiliara/issues"
+  },
+  "homepage": "https://github.com/AzazAhmedLipu79/Affiliara#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "netlify-lambda": "^2.0.16",
+    "nodemon": "^2.0.22",
+    "serverless-http": "^3.2.0"
+  }
+}

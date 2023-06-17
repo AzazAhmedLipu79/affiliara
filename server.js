@@ -6,9 +6,6 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use("/user", express.static("user.txt"));
-app.use("/user/json", express.static("user.json"));
-app.use("/email", express.static("email.txt"));
 
 app.get("/", (req, res) => {
   res.send({ message: "Hello AFFILIARA" });
@@ -30,7 +27,6 @@ app.post("/newsletter", async (req, res) => {
       };
       let User = new UserModel(data);
       let CreateUser = await User.save();
-      //   sendPushToAllSubscribedUsers();
       res.status(201).send({ status: "SUCCESS", data: CreateUser });
     } else {
       res.status(404).send({ status: "BODY_DATA_NOT_FOUND" });
